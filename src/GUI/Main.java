@@ -1,5 +1,6 @@
 package GUI;
 
+import Buttons.CornerButton;
 import Lapp.Lapp;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -17,29 +18,27 @@ import java.util.*;
 
 
 public class Main extends Application {
-    private List<Lapp> lapper;
-    private Scene vindu;
-    private Group root = new Group();
-    private Button nyLapp = new Button();
-    private Button exitButton = new Button();
-    private Button hidebutton = new Button();
-    private int listeStart = 45;
-    private Font font = new Font(20);
-    private Map map = new HashMap<Lapp, LappGUI>();
-    private Stage primaryStage;
+    public static final Font symbol = new Font(25);
+    public static List<Lapp> lapper;
+    private static Scene vindu;
+    private static Group root = new Group();
+    private static int listeStart = 45;
+    private static Font font = new Font(20);
+    private static Map map = new HashMap<Lapp, LappGUI>();
+    private static Stage primaryStage;
+    private static double xOffset, yOffset = 0;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        lapper = XMLHandler.xmlToObject();
+        lapper = XMLHandler.xmlToObject(); //Henter data fra data.xml hvis finnes
         if(lapper == null) {
            lapper = new ArrayList<>();
         }
-        vindu = new Scene(root, 300, 300);
-        vindu.setFill(Color.YELLOW.desaturate());
+        makeScene();
         primaryStage.setTitle("Klistrelapper");
         primaryStage.setScene(vindu);
-       // primaryStage.initStyle(StageStyle.TRANSPARENT);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
         primaryStage.setOnCloseRequest(e -> {
             saveAndClose();
@@ -47,7 +46,20 @@ public class Main extends Application {
         print();
     }
 
-    public void makeNewNote() {
+    public static void makeScene() {
+        vindu = new Scene(root, 300, 300);
+        vindu.setOnMousePressed(e -> {
+            xOffset = e.getSceneX();
+            yOffset = e.getSceneY();
+        });
+        vindu.setOnMouseDragged(e -> {
+            primaryStage.setX(e.getScreenX() - xOffset);
+            primaryStage.setY(e.getScreenY() - yOffset);
+        });
+        vindu.setFill(Color.YELLOW.desaturate());
+    }
+
+    public static void makeNewNote() {
         TextField tf = new TextField();
         tf.setFont(font);
         tf.setStyle("-fx-background-color: white;");
@@ -73,7 +85,7 @@ public class Main extends Application {
         });
     }
 
-    public void print() {
+    public static void print() {
         root.getChildren().clear();
         makeButtons();
 
@@ -113,42 +125,18 @@ public class Main extends Application {
         listeStart = 45;
     }
 
-    public void makeButtons() {
-        Font pluss = new Font("+",25);
+    public static void makeButtons() {
+        CornerButton nyLapp = new CornerButton("+", 0, 0);
+        CornerButton exitButton = new CornerButton("x", 265, -15);
+        CornerButton hidebutton = new CornerButton("-", 240, -15);
 
-        nyLapp.setText("+");
-        nyLapp.setLayoutX(0);
-        nyLapp.setLayoutY(0);
-        nyLapp.setTextFill(Color.BLACK);
-        nyLapp.setFont(pluss);
-        nyLapp.setStyle("-fx-background-color: transparent;");
-        nyLapp.setOnMouseEntered(e -> nyLapp.setTextFill(Color.GRAY));
-        nyLapp.setOnMouseExited(e -> nyLapp.setTextFill(Color.BLACK));
         nyLapp.setOnMouseClicked(e -> makeNewNote());
 
-        root.getChildren().add(nyLapp);
-
-        exitButton.setText("x");
-        exitButton.setLayoutX(265);
-        exitButton.setLayoutY(-15);
-        exitButton.setFont(pluss);
-        exitButton.setStyle("-fx-background-color: transparent;");
-        exitButton.setOnMouseEntered(e -> exitButton.setTextFill(Color.GRAY));
-        exitButton.setOnMouseExited(e -> exitButton.setTextFill(Color.BLACK));
         exitButton.setOnMouseClicked(e -> {
             saveAndClose();
             primaryStage.close();
         });
 
-        root.getChildren().add(exitButton);
-
-        hidebutton.setText("-");
-        hidebutton.setLayoutX(240);
-        hidebutton.setLayoutY(-15);
-        hidebutton.setFont(pluss);
-        hidebutton.setStyle("-fx-background-color: transparent;");
-        hidebutton.setOnMouseEntered(e -> hidebutton.setTextFill(Color.GRAY));
-        hidebutton.setOnMouseExited(e -> hidebutton.setTextFill(Color.BLACK));
         hidebutton.setOnMouseClicked(e -> {
             primaryStage.setIconified(true);
             Set keys = map.keySet();
@@ -158,17 +146,20 @@ public class Main extends Application {
             }
         });
 
+        root.getChildren().add(nyLapp);
+        root.getChildren().add(exitButton);
         root.getChildren().add(hidebutton);
     }
 
-    public void closeGui(Lapp lapp) {
+    public static void closeGui(Lapp lapp) {
         LappGUI gui = (LappGUI) map.get(lapp);
         lapp.setText(gui.getText()); //Larger teksten
         map.remove(lapp);
         gui.close();
+        print();
     }
 
-    public void saveAndClose() {
+    public static void saveAndClose() {
         Set keys = map.keySet();
         List<Lapp> lapp = new ArrayList<>();
         //Dobbelt loop pga concurrentmodification
