@@ -1,11 +1,11 @@
 package GUI;
 
 import Buttons.CornerButton;
+import Buttons.LappButton;
 import Lapp.Lapp;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -16,15 +16,14 @@ import xml.XMLHandler;
 
 import java.util.*;
 
-
 public class Main extends Application {
     public static final Font symbol = new Font(25);
     public static List<Lapp> lapper;
     private static Scene vindu;
     private static Group root = new Group();
-    private static int listeStart = 45;
-    private static Font font = new Font(20);
-    private static Map map = new HashMap<Lapp, LappGUI>();
+    private static int mellomrom = 45;
+    public static Font font = new Font(20);
+    public static Map map = new HashMap<Lapp, LappGUI>();
     private static Stage primaryStage;
     private static double xOffset, yOffset = 0;
 
@@ -35,6 +34,12 @@ public class Main extends Application {
         if(lapper == null) {
            lapper = new ArrayList<>();
         }
+        for(Lapp lapp: lapper) {
+            if (lapp.isOpen()) {
+                createLappGUI(lapp);
+            }
+        }
+
         makeScene();
         primaryStage.setTitle("Klistrelapper");
         primaryStage.setScene(vindu);
@@ -77,7 +82,8 @@ public class Main extends Application {
                     print();
                     return;
                 }
-                lapper.add(new Lapp(tf.getText()));
+                lapper.add(new Lapp(tf.getText(),"yellow" ,
+                        primaryStage.getX()+350 ,primaryStage.getY()-50));
                 root.getChildren().remove(root.getChildren().lastIndexOf(tf));
                 print();
 
@@ -90,45 +96,18 @@ public class Main extends Application {
         makeButtons();
 
         for(Lapp lapp: lapper) {
-            Button tmp = new Button();
-            tmp.setLayoutY(listeStart);
-            listeStart += 30;
-            tmp.setLayoutX(0);
-            tmp.setText(lapp.getOverSkrift());
-            tmp.setStyle("-fx-background-color: transparent;");
-            tmp.setFont(font);
-            if(map.containsKey(lapp)) {
-                tmp.setTextFill(Color.GRAY);
-            }
-            tmp.setOnMouseEntered(event -> tmp.setTextFill(Color.GRAY));
-            tmp.setOnMouseExited(event -> {
-                if(!map.containsKey(lapp)) tmp.setTextFill(Color.BLACK);
-            });
+            LappButton lappbutton = new LappButton(0, mellomrom, lapp);
+            mellomrom += 30;
 
-            tmp.setOnAction(event -> {
-                if(map.containsKey(lapp)) {
-                    closeGui(lapp);
-                    tmp.setTextFill(Color.BLACK);
-                } else {
-                    tmp.setTextFill(Color.GRAY);
-                    LappGUI lappGUI = new LappGUI(lapp);
-                    map.put(lapp, lappGUI);
-                    lappGUI.setAlwaysOnTop(true);
-                    lappGUI.setOnCloseRequest(event1 -> {
-                        closeGui(lapp);
-                        tmp.setTextFill(Color.BLACK);
-                    });
-                }
-            });
-            root.getChildren().add(tmp);
+            root.getChildren().add(lappbutton);
         }
-        listeStart = 45;
+        mellomrom = 45;
     }
 
     public static void makeButtons() {
         CornerButton nyLapp = new CornerButton("+", 0, 0);
-        CornerButton exitButton = new CornerButton("x", 265, -15);
-        CornerButton hidebutton = new CornerButton("-", 240, -15);
+        CornerButton exitButton = new CornerButton("⨯", 265, -15);
+        CornerButton hidebutton = new CornerButton("-", 245, -15);
 
         nyLapp.setOnMouseClicked(e -> makeNewNote());
 
@@ -152,6 +131,7 @@ public class Main extends Application {
     }
 
     public static void closeGui(Lapp lapp) {
+        lapp.setOpen(false);
         LappGUI gui = (LappGUI) map.get(lapp);
         lapp.setText(gui.getText()); //Larger teksten
         map.remove(lapp);
@@ -167,10 +147,32 @@ public class Main extends Application {
             lapp.add((Lapp)key);
         }
         for(Lapp la: lapp) {
-            closeGui(la);
+            if(la.isOpen()) {
+                closeGui(la);
+                la.setOpen(true);
+            }
         }
         XMLHandler.toXML(lapper);
     }
+
+    public static void createLappGUI(Lapp lapp) {
+        LappGUI lappGUI = new LappGUI(lapp);
+        map.put(lapp, lappGUI);
+        lappGUI.setOnCloseRequest(event1 -> {
+            closeGui(lapp);
+        });
+    }
+
+    public static int clamp(int var, int min, int max) {
+        if(var >= max) {
+            return var = max;
+        } else if(var <= min) {
+            return var = min;
+        } else {
+            return var;
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

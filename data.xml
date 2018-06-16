@@ -1,27 +1,20 @@
 <list>
   <Lapp.Lapp>
     <overSkrift>Handleliste</overSkrift>
-    <tekst>Hei pappa
-
+    <tekst>daasd
+sa
+d
+as
+das
+d
+sa
+• dasdasdas
 
 </tekst>
-  </Lapp.Lapp>
-  <Lapp.Lapp>
-    <overSkrift>Gjøreliste</overSkrift>
-    <tekst>* Finere font
-* Finere topp
-* Ny font</tekst>
-  </Lapp.Lapp>
-  <Lapp.Lapp>
-    <overSkrift>Nylapp</overSkrift>
-    <tekst>fsd
-fds
-fds
-f
-ds
-f
-ds
-f
-ds</tekst>
+    <posX>120.00000000000001</posX>
+    <posY>107.33333333333334</posY>
+    <open>true</open>
+    <rowLength>10</rowLength>
+    <color>yellow</color>
   </Lapp.Lapp>
 </list>
