@@ -1,12 +1,3 @@
-.text-area .scroll-bar:vertical:disabled {
-    -fx-opacity: 0;
-}
-
-.scroll-pane {
-    -fx-hbar-policy: never;
-    -fx-vbar-policy: never;
-}
-
 .text-area {
     -fx-background-color: transparent, #FFFF4D, transparent, #FFFF4D;
     -fx-focus-color: #FFFF4D;

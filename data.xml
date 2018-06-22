@@ -1,20 +1,19 @@
 <list>
   <Lapp.Lapp>
-    <overSkrift>Handleliste</overSkrift>
-    <tekst>daasd
-sa
+    <overSkrift>sdfsdfsd</overSkrift>
+    <tekst>dd
 d
-as
-das
 d
-sa
-• dasdasdas
-
+d
+d
+d
+d
 </tekst>
-    <posX>120.00000000000001</posX>
-    <posY>107.33333333333334</posY>
+    <posX>840.0</posX>
+    <posY>76.66666412353516</posY>
     <open>true</open>
-    <rowLength>10</rowLength>
-    <color>yellow</color>
+    <rowLength>8</rowLength>
+    <color>purple</color>
+    <width>300.0</width>
   </Lapp.Lapp>
 </list>

@@ -1,7 +1,7 @@
 package GUI;
 
 import Buttons.CornerButton;
-import Buttons.LappButton;
+import Buttons.LappRow;
 import Lapp.Lapp;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -24,7 +24,8 @@ public class Main extends Application {
     private static int mellomrom = 45;
     public static Font font = new Font(20);
     public static Map map = new HashMap<Lapp, LappGUI>();
-    private static Stage primaryStage;
+    public static Map colorMap = new HashMap<String, Color>();
+    public static Stage primaryStage;
     private static double xOffset, yOffset = 0;
 
     @Override
@@ -41,6 +42,7 @@ public class Main extends Application {
         }
 
         makeScene();
+        initColors();
         primaryStage.setTitle("Klistrelapper");
         primaryStage.setScene(vindu);
         primaryStage.initStyle(StageStyle.UNDECORATED);
@@ -51,7 +53,7 @@ public class Main extends Application {
         print();
     }
 
-    public static void makeScene() {
+    private static void makeScene() {
         vindu = new Scene(root, 300, 300);
         vindu.setOnMousePressed(e -> {
             xOffset = e.getSceneX();
@@ -64,7 +66,7 @@ public class Main extends Application {
         vindu.setFill(Color.YELLOW.desaturate());
     }
 
-    public static void makeNewNote() {
+    private static void makeNewNote() {
         TextField tf = new TextField();
         tf.setFont(font);
         tf.setStyle("-fx-background-color: white;");
@@ -96,18 +98,23 @@ public class Main extends Application {
         makeButtons();
 
         for(Lapp lapp: lapper) {
-            LappButton lappbutton = new LappButton(0, mellomrom, lapp);
-            mellomrom += 30;
-
-            root.getChildren().add(lappbutton);
+            LappRow lappRow = new LappRow(0, mellomrom, lapp);
+            root.getChildren().add(lappRow.getG());
+            mellomrom += 35;
         }
         mellomrom = 45;
+        double height = (mellomrom-8)*lapper.size()+40;
+        if(height < 300) {
+            primaryStage.setHeight(300);
+        } else {
+            primaryStage.setHeight(height);
+        }
     }
 
-    public static void makeButtons() {
-        CornerButton nyLapp = new CornerButton("+", 0, 0);
-        CornerButton exitButton = new CornerButton("⨯", 265, -15);
-        CornerButton hidebutton = new CornerButton("-", 245, -15);
+    private static void makeButtons() {
+        CornerButton nyLapp = new CornerButton("+", vindu,0, 0);
+        CornerButton exitButton = new CornerButton("⨯", vindu, 265, -15);
+        CornerButton hideButton = new CornerButton("-", vindu, 245, -15);
 
         nyLapp.setOnMouseClicked(e -> makeNewNote());
 
@@ -116,7 +123,7 @@ public class Main extends Application {
             primaryStage.close();
         });
 
-        hidebutton.setOnMouseClicked(e -> {
+        hideButton.setOnMouseClicked(e -> {
             primaryStage.setIconified(true);
             Set keys = map.keySet();
             for(Object key: keys) {
@@ -127,13 +134,17 @@ public class Main extends Application {
 
         root.getChildren().add(nyLapp);
         root.getChildren().add(exitButton);
-        root.getChildren().add(hidebutton);
+        root.getChildren().add(hideButton);
     }
 
     public static void closeGui(Lapp lapp) {
         lapp.setOpen(false);
         LappGUI gui = (LappGUI) map.get(lapp);
+        if(gui == null) {
+            return;
+        }
         lapp.setText(gui.getText()); //Larger teksten
+        lapp.setWidth(gui.getWidth()-4);
         map.remove(lapp);
         gui.close();
         print();
@@ -163,14 +174,30 @@ public class Main extends Application {
         });
     }
 
-    public static int clamp(int var, int min, int max) {
+    public static int clampInt(int var, int min, int max) {
         if(var >= max) {
-            return var = max;
+            return max;
         } else if(var <= min) {
-            return var = min;
+            return min;
         } else {
             return var;
         }
+    }
+
+    public static double clampDo(double var, double min, double max) {
+        if(var >= max) {
+            return max;
+        } else if(var <= min) {
+            return min;
+        } else {
+            return var;
+        }
+    }
+
+    private static void initColors() {
+        colorMap.put("yellow", Color.YELLOW.desaturate());
+        colorMap.put("purple", Color.PURPLE.desaturate());
+        colorMap.put("blue", Color.BLUE.darker());
     }
 
     public static void main(String[] args) {

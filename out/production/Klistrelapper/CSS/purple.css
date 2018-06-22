@@ -1,0 +1,10 @@
+
+.text-area {
+    -fx-background-color: transparent, #cb32ff, transparent, #cb32ff;
+    -fx-focus-color: #cb32ff;
+    -fx-text-box-border: #cb32ff;
+}
+
+.text-area .content {
+    -fx-background-color: transparent, #cb32ff, transparent, #cb32ff;
+}

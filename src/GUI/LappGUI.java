@@ -3,14 +3,17 @@ package GUI;
 import Buttons.CornerButton;
 import Lapp.Lapp;
 import javafx.geometry.Bounds;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import tools.ResizeHelper;
 
 
 public class LappGUI extends Stage {
@@ -19,14 +22,17 @@ public class LappGUI extends Stage {
     private Group g = new Group();
     private double xOffset, yOffset = 0;
     private int rows;
+    private CornerButton exitButton;
+    private CornerButton hideButton;
+    private boolean ctrl, u, l = false;
+    private Scene scene;
 
     public LappGUI(Lapp lapp) {
         this.lapp = lapp;
         rows = lapp.getRowLength();
         lapp.setOpen(true);
         setTitle(lapp.getOverSkrift());
-        setHeight(300);
-        setWidth(300);
+        setWidth(lapp.getWidth() + 4);
         setX(lapp.getPosX());
         setY(lapp.getPosY());
         initStyle(StageStyle.UNDECORATED);
@@ -34,8 +40,12 @@ public class LappGUI extends Stage {
         show();
         this.setResizable(true);
 
-        Scene scene = makeScene();
+
+        scene = makeScene();
+        updateColor();
         setScene(scene);
+
+        ResizeHelper.addResizeListener(this);
 
         makeTextBox();
         makeButtons();
@@ -44,31 +54,36 @@ public class LappGUI extends Stage {
 
     public Scene makeScene() {
         Scene scene = new Scene(g);
-        scene.getStylesheets().add("style.css");
-        System.out.println(lapp.getColor());
-        if(lapp.getColor().equals("yellow")) {
-            scene.setFill(Color.YELLOW);
-        } else if(lapp.getColor().equals("purple")) {
-            scene.setFill(Color.PURPLE);
-        }
         scene.setOnMousePressed(e -> {
             xOffset = e.getSceneX();
             yOffset = e.getSceneY();
         });
-        scene.setOnMouseDragged(e -> {
-            double x = e.getScreenX() - xOffset;
-            double y = e.getScreenY() - yOffset;
-            setX(x);
-            setY(y);
-            lapp.setPosX(x);
-            lapp.setPosY(y);
+        scene.setOnMouseMoved(e -> {
+            if (e.getX() < scene.getWidth() - 20) {
+                scene.setCursor(Cursor.HAND);
+            }
         });
+        scene.setOnMouseDragged(e -> {
+            if (scene.getCursor() == Cursor.HAND || scene.getCursor() == Cursor.CLOSED_HAND) {
+                double x = e.getScreenX() - xOffset;
+                double y = e.getScreenY() - yOffset;
+                setX(x);
+                setY(y);
+                lapp.setPosX(x);
+                lapp.setPosY(y);
+            }
+        });
+        scene.setOnDragDetected(e -> {
+            if (scene.getCursor() == Cursor.HAND)
+                scene.setCursor(Cursor.CLOSED_HAND);
+        });
+        scene.setOnDragDone(e -> scene.setCursor(Cursor.DEFAULT));
         return scene;
     }
 
     public void makeTextBox() {
         g.getChildren().add(txt);
-        txt.setPrefWidth(300);
+        txt.setPrefWidth(lapp.getWidth());
         txt.setPrefHeight(270);
         txt.setLayoutY(30);
         txt.setText(lapp.getText());
@@ -78,7 +93,7 @@ public class LappGUI extends Stage {
         updateHeight();
         txt.textProperty().addListener((observable, oldValue, newValue) -> {
             rows = getRowCount(txt);
-            rows = Main.clamp(rows, 0, 30);
+            rows = Main.clampInt(rows, 0, 30);
             updateHeight();
 
             String text = txt.getText();
@@ -88,12 +103,34 @@ public class LappGUI extends Stage {
             lapp.setRowLength(rows);
         });
 
+        txt.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.CONTROL) ctrl = true;
+            else if (e.getCode() == KeyCode.U) u = true;
+            else if (e.getCode() == KeyCode.L) l = true;
+            if (ctrl && u) {
+                String newText = txt.getSelectedText();
+                newText = newText.toUpperCase();
+                txt.replaceText(txt.getSelection(), newText);
+            }
+            if (ctrl && l) {
+                String newText = txt.getSelectedText();
+                newText = newText.toLowerCase();
+                txt.replaceText(txt.getSelection(), newText);
+            }
+
+        });
+        txt.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.CONTROL) ctrl = false;
+            else if (e.getCode() == KeyCode.U) u = false;
+            else if (e.getCode() == KeyCode.L) l = false;
+        });
+
     }
 
     public void makeButtons() {
-        CornerButton deleteButton = new CornerButton("\uD83D\uDDD1", -10, -11);
-        CornerButton exitButton = new CornerButton("⨯", 265, -15);
-        CornerButton hidebutton = new CornerButton("-", 240, -15);
+        CornerButton deleteButton = new CornerButton("\uD83D\uDDD1", getScene(), -10, -11);
+        exitButton = new CornerButton("⨯", getScene(), lapp.getWidth() - 35, -15);
+        hideButton = new CornerButton("-", getScene(), lapp.getWidth() - 60, -15);
 
         deleteButton.setOnMouseClicked(e -> {
             Main.lapper.remove(lapp);
@@ -104,11 +141,11 @@ public class LappGUI extends Stage {
             Main.closeGui(lapp);
         });
 
-        hidebutton.setOnMouseClicked(e -> setIconified(true));
+        hideButton.setOnMouseClicked(e -> setIconified(true));
 
         g.getChildren().add(deleteButton);
         g.getChildren().add(exitButton);
-        g.getChildren().add(hidebutton);
+        g.getChildren().add(hideButton);
     }
 
     public void makeHeader() {
@@ -128,23 +165,37 @@ public class LappGUI extends Stage {
     }
 
     private void updateHeight() {
-        if(rows < 10) {
+        if (rows < 10) {
             txt.setPrefHeight(270);
             setHeight(300);
         } else {
-            double heightForRows = 24.4*(rows-10);
+            double heightForRows = 24.4 * (rows - 10);
             txt.setPrefHeight(270 + heightForRows);
             setHeight(300 + heightForRows);
+        }
+    }
+
+    public void updateColor() {
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add("CSS/style.css");
+        if (lapp.getColor().equals("yellow")) {
+            scene.setFill(Color.YELLOW);
+            scene.getStylesheets().add("CSS/yellow.css");
+        } else if (lapp.getColor().equals("purple")) {
+            scene.setFill(Color.PURPLE);
+            scene.getStylesheets().add("CSS/purple.css");
+        } else if (lapp.getColor().equals("blue")) {
+            scene.setFill(Color.BLUE);
+            scene.getStylesheets().add("CSS/blue.css");
         }
     }
 
     private int getRowCount(TextArea textArea) {
         int currentRowCount = 0;
         Text helper = new Text();
-        if(textArea.isWrapText()) {
-            // text needs to be on the scene
+        if (textArea.isWrapText()) {
             Text text = (Text) textArea.lookup(".text");
-            if(text == null) {
+            if (text == null) {
                 return currentRowCount;
             }
             helper.setFont(textArea.getFont());
@@ -153,12 +204,10 @@ public class LappGUI extends Stage {
                 Bounds localBounds = helper.getBoundsInLocal();
 
                 double paragraphWidth = localBounds.getWidth();
-                if(paragraphWidth > text.getWrappingWidth()) {
+                if (paragraphWidth > text.getWrappingWidth()) {
                     double oldHeight = localBounds.getHeight();
-                    // this actually sets the automatic size adjustment into motion...
                     helper.setWrappingWidth(text.getWrappingWidth());
                     double newHeight = helper.getBoundsInLocal().getHeight();
-                    // ...and we reset it after computation
                     helper.setWrappingWidth(0.0D);
 
                     int paragraphLineCount = Double.valueOf(newHeight / oldHeight).intValue();
@@ -171,5 +220,17 @@ public class LappGUI extends Stage {
             currentRowCount = textArea.getParagraphs().size();
         }
         return currentRowCount;
+    }
+
+    public TextArea getTxt() {
+        return txt;
+    }
+
+    public CornerButton getExitButton() {
+        return exitButton;
+    }
+
+    public CornerButton getHideButton() {
+        return hideButton;
     }
 }

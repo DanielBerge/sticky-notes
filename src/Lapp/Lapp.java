@@ -7,12 +7,14 @@ public class Lapp {
     private boolean open;
     private int rowLength;
     private String color;
+    private double width;
 
     public Lapp(String s, String color, double posX, double posY) {
         overSkrift = s;
         this.color = color;
         this.posX = posX;
         this.posY = posY;
+        this.width = 300;
     }
 
     public void setText(String s) {
@@ -65,5 +67,13 @@ public class Lapp {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public double getWidth() {
+        return width;
     }
 }
