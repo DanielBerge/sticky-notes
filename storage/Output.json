@@ -1,0 +1,24 @@
+{
+  "lapps": [
+    {
+      "overSkrift": "Jadaf",
+      "tekst": "",
+      "posX": 840.0,
+      "posY": 76.66666412353516,
+      "open": true,
+      "rowLength": 1,
+      "color": "blue",
+      "width": 300.0
+    },
+    {
+      "overSkrift": "fsdf",
+      "tekst": "\n\ndasdas\ndasdasd",
+      "posX": 94.66666666666667,
+      "posY": 171.33333333333334,
+      "open": false,
+      "rowLength": 4,
+      "color": "yellow",
+      "width": 300.0
+    }
+  ]
+}

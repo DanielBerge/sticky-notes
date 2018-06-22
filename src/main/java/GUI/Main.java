@@ -3,6 +3,7 @@ package GUI;
 import Buttons.CornerButton;
 import Buttons.LappRow;
 import Lapp.Lapp;
+import Lapp.LappList;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -12,13 +13,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import xml.JsonHandler;
+import xml.JsonUniversalHandler;
 import xml.XMLHandler;
 
+import java.io.File;
 import java.util.*;
 
 public class Main extends Application {
     public static final Font symbol = new Font(25);
-    public static List<Lapp> lapper;
+    public static LappList lapper;
     private static Scene vindu;
     private static Group root = new Group();
     private static int mellomrom = 45;
@@ -27,15 +31,19 @@ public class Main extends Application {
     public static Map colorMap = new HashMap<String, Color>();
     public static Stage primaryStage;
     private static double xOffset, yOffset = 0;
+    private static JsonUniversalHandler jsonUniversalHandler = new JsonUniversalHandler("storage");
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        lapper = XMLHandler.xmlToObject(); //Henter data fra data.xml hvis finnes
-        if(lapper == null) {
-           lapper = new ArrayList<>();
+        File file = jsonUniversalHandler.getFile("Output.json");
+        if(!file.exists()) {
+            lapper = new LappList();
+        } else {
+            lapper = jsonUniversalHandler.load("Output.json", LappList.class);
         }
-        for(Lapp lapp: lapper) {
+        for(Lapp lapp: lapper.getList()) {
             if (lapp.isOpen()) {
                 createLappGUI(lapp);
             }
@@ -97,7 +105,7 @@ public class Main extends Application {
         root.getChildren().clear();
         makeButtons();
 
-        for(Lapp lapp: lapper) {
+        for(Lapp lapp: lapper.getList()) {
             LappRow lappRow = new LappRow(0, mellomrom, lapp);
             root.getChildren().add(lappRow.getG());
             mellomrom += 35;
@@ -163,7 +171,8 @@ public class Main extends Application {
                 la.setOpen(true);
             }
         }
-        XMLHandler.toXML(lapper);
+        jsonUniversalHandler.save("Output.json", lapper);
+
     }
 
     public static void createLappGUI(Lapp lapp) {
