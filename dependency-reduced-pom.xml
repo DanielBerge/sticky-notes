@@ -27,6 +27,11 @@
               <include>javax.activation:activation</include>
               <include>com.google.code.gson:gson</include>
               <include>commons-io:commons-io</include>
+              <include>org.fxmisc.richtext:richtextfx</include>
+              <include>org.fxmisc.undo:undofx</include>
+              <include>org.fxmisc.flowless:flowless</include>
+              <include>org.fxmisc.wellbehaved:wellbehavedfx</include>
+              <include>org.reactfx:reactfx</include>
             </includes>
           </artifactSet>
         </configuration>
@@ -81,8 +86,8 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 </project>
 

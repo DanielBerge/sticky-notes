@@ -13,9 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import xml.JsonHandler;
-import xml.JsonUniversalHandler;
-import xml.XMLHandler;
+import storage.JsonHandler;
 
 import java.io.File;
 import java.util.*;
@@ -31,17 +29,17 @@ public class Main extends Application {
     public static Map colorMap = new HashMap<String, Color>();
     public static Stage primaryStage;
     private static double xOffset, yOffset = 0;
-    private static JsonUniversalHandler jsonUniversalHandler = new JsonUniversalHandler("storage");
+    private static JsonHandler jsonHandler = new JsonHandler("storage");
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        File file = jsonUniversalHandler.getFile("Output.json");
+        File file = jsonHandler.getFile("Output.json");
         if(!file.exists()) {
             lapper = new LappList();
         } else {
-            lapper = jsonUniversalHandler.load("Output.json", LappList.class);
+            lapper = jsonHandler.load("Output.json", LappList.class);
         }
         for(Lapp lapp: lapper.getList()) {
             if (lapp.isOpen()) {
@@ -162,17 +160,15 @@ public class Main extends Application {
         Set keys = map.keySet();
         List<Lapp> lapp = new ArrayList<>();
         //Dobbelt loop pga concurrentmodification
-        for(Object key: keys) {
+        for(Object key: keys)
             lapp.add((Lapp)key);
-        }
         for(Lapp la: lapp) {
             if(la.isOpen()) {
                 closeGui(la);
                 la.setOpen(true);
             }
         }
-        jsonUniversalHandler.save("Output.json", lapper);
-
+        jsonHandler.save("Output.json", lapper);
     }
 
     public static void createLappGUI(Lapp lapp) {

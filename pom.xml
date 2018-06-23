@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?storage version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -24,6 +24,11 @@
                             <include>javax.activation:activation</include>
                             <include>com.google.code.gson:gson</include>
                             <include>commons-io:commons-io</include>
+                            <include>org.fxmisc.richtext:richtextfx</include>
+                            <include>org.fxmisc.undo:undofx</include>
+                            <include>org.fxmisc.flowless:flowless</include>
+                            <include>org.fxmisc.wellbehaved:wellbehavedfx</include>
+                            <include>org.reactfx:reactfx</include>
                         </includes>
                     </artifactSet>
                 </configuration>
@@ -104,6 +109,34 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
+        </dependency>
+        <!-- A text area that doesn't cause lag when there's a lot of text -->
+        <!-- https://github.com/FXMisc/RichTextFX -->
+        <dependency>
+            <groupId>org.fxmisc.richtext</groupId>
+            <artifactId>richtextfx</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+        <!-- RichTextFx Dependencies -->
+        <dependency>
+            <groupId>org.fxmisc.undo</groupId>
+            <artifactId>undofx</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fxmisc.flowless</groupId>
+            <artifactId>flowless</artifactId>
+            <version>0.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fxmisc.wellbehaved</groupId>
+            <artifactId>wellbehavedfx</artifactId>
+            <version>0.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reactfx</groupId>
+            <artifactId>reactfx</artifactId>
+            <version>2.0-M5</version>
         </dependency>
     </dependencies>
     <properties>

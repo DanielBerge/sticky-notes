@@ -7,24 +7,28 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.fxmisc.richtext.StyleClassedTextArea;
 import tools.ResizeHelper;
+
+import java.awt.*;
+import java.util.Collections;
 
 
 public class LappGUI extends Stage {
     private Lapp lapp;
-    private TextArea txt = new TextArea();
+    private StyleClassedTextArea txt = new StyleClassedTextArea();
     private Group g = new Group();
     private double xOffset, yOffset = 0;
     private int rows;
     private CornerButton exitButton;
     private CornerButton hideButton;
-    private boolean ctrl, u, l = false;
+    private boolean ctrl, u, l, b = false;
     private Scene scene;
 
     public LappGUI(Lapp lapp) {
@@ -40,16 +44,16 @@ public class LappGUI extends Stage {
         show();
         this.setResizable(true);
 
-
         scene = makeScene();
         updateColor();
         setScene(scene);
 
         ResizeHelper.addResizeListener(this);
 
-        makeTextBox();
-        makeButtons();
         makeHeader();
+        makeButtons();
+        makeTextBox();
+        updateHeight();
     }
 
     public Scene makeScene() {
@@ -83,17 +87,23 @@ public class LappGUI extends Stage {
 
     public void makeTextBox() {
         g.getChildren().add(txt);
+
         txt.setPrefWidth(lapp.getWidth());
         txt.setPrefHeight(270);
         txt.setLayoutY(30);
-        txt.setText(lapp.getText());
+        txt.showParagraphAtTop(0);
+        if(lapp.getText() != null)
+            txt.appendText(lapp.getText());
         txt.setWrapText(true);
-        Font font = new Font(16);
-        txt.setFont(font);
-        updateHeight();
+
         txt.textProperty().addListener((observable, oldValue, newValue) -> {
-            rows = getRowCount(txt);
+            try {
+                rows = (int) txt.getTotalHeightEstimate() / 20;
+            } catch (NullPointerException e) {
+                rows = 1;
+            }
             rows = Main.clampInt(rows, 0, 30);
+
             updateHeight();
 
             String text = txt.getText();
@@ -107,6 +117,7 @@ public class LappGUI extends Stage {
             if (e.getCode() == KeyCode.CONTROL) ctrl = true;
             else if (e.getCode() == KeyCode.U) u = true;
             else if (e.getCode() == KeyCode.L) l = true;
+            else if (e.getCode() == KeyCode.B) b = true;
             if (ctrl && u) {
                 String newText = txt.getSelectedText();
                 newText = newText.toUpperCase();
@@ -118,13 +129,18 @@ public class LappGUI extends Stage {
                 txt.replaceText(txt.getSelection(), newText);
             }
 
+            if(ctrl && b) {
+                txt.setStyle(txt.getSelection().getStart(),txt.getSelection().getEnd(),
+                        Collections.singleton("bold"));
+            }
+
         });
         txt.setOnKeyReleased(e -> {
             if (e.getCode() == KeyCode.CONTROL) ctrl = false;
             else if (e.getCode() == KeyCode.U) u = false;
             else if (e.getCode() == KeyCode.L) l = false;
+            else if (e.getCode() == KeyCode.B) b = false;
         });
-
     }
 
     public void makeButtons() {
@@ -169,9 +185,12 @@ public class LappGUI extends Stage {
             txt.setPrefHeight(270);
             setHeight(300);
         } else {
-            double heightForRows = 24.4 * (rows - 10);
-            txt.setPrefHeight(270 + heightForRows);
-            setHeight(300 + heightForRows);
+            double heightForRows =  21 * (rows - 12);
+            if(heightForRows >= 0) {
+                txt.setPrefHeight(270 + heightForRows);
+                setHeight(300 + heightForRows);
+                System.out.println("Rows: " + rows + "Height: " + heightForRows);
+            }
         }
     }
 
@@ -190,39 +209,7 @@ public class LappGUI extends Stage {
         }
     }
 
-    private int getRowCount(TextArea textArea) {
-        int currentRowCount = 0;
-        Text helper = new Text();
-        if (textArea.isWrapText()) {
-            Text text = (Text) textArea.lookup(".text");
-            if (text == null) {
-                return currentRowCount;
-            }
-            helper.setFont(textArea.getFont());
-            for (CharSequence paragraph : textArea.getParagraphs()) {
-                helper.setText(paragraph.toString());
-                Bounds localBounds = helper.getBoundsInLocal();
-
-                double paragraphWidth = localBounds.getWidth();
-                if (paragraphWidth > text.getWrappingWidth()) {
-                    double oldHeight = localBounds.getHeight();
-                    helper.setWrappingWidth(text.getWrappingWidth());
-                    double newHeight = helper.getBoundsInLocal().getHeight();
-                    helper.setWrappingWidth(0.0D);
-
-                    int paragraphLineCount = Double.valueOf(newHeight / oldHeight).intValue();
-                    currentRowCount += paragraphLineCount;
-                } else {
-                    currentRowCount += 1;
-                }
-            }
-        } else {
-            currentRowCount = textArea.getParagraphs().size();
-        }
-        return currentRowCount;
-    }
-
-    public TextArea getTxt() {
+    public StyleClassedTextArea getTxt() {
         return txt;
     }
 

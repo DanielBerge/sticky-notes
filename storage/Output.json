@@ -1,24 +1,24 @@
 {
   "lapps": [
     {
-      "overSkrift": "Jadaf",
-      "tekst": "",
-      "posX": 840.0,
-      "posY": 76.66666412353516,
-      "open": true,
-      "rowLength": 1,
-      "color": "blue",
+      "overSkrift": "fdsfsd",
+      "tekst": "\nfsdfsdfsdddddddddd",
+      "posX": 258.0,
+      "posY": 239.33333333333334,
+      "open": false,
+      "rowLength": 2,
+      "color": "yellow",
       "width": 300.0
     },
     {
-      "overSkrift": "fsdf",
-      "tekst": "\n\ndasdas\ndasdasd",
-      "posX": 94.66666666666667,
-      "posY": 171.33333333333334,
-      "open": false,
-      "rowLength": 4,
+      "overSkrift": "ddfs",
+      "tekst": "dasfdsfsddas\nd\nr\n\n",
+      "posX": 833.3333333333334,
+      "posY": -1.9999999999999982,
+      "open": true,
+      "rowLength": 5,
       "color": "yellow",
-      "width": 300.0
+      "width": 296.0
     }
   ]
 }

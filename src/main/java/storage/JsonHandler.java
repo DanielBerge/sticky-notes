@@ -1,4 +1,4 @@
-package xml;
+package storage;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,11 +8,11 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class JsonUniversalHandler {
+public class JsonHandler {
 
     private String directory;
 
-    public JsonUniversalHandler(String directory) {
+    public JsonHandler(String directory) {
         this.directory = directory;
     }
 
