@@ -1,9 +1,0 @@
-.styled-text-area {
-    -fx-background-color: transparent, #FFFF4D, transparent, #FFFF4D;
-    -fx-focus-color: #FFFF4D;
-    -fx-text-box-border: #FFFF4D;
-}
-
-.styled-text-area .content {
-    -fx-background-color: transparent, #FFFF4D, transparent, #FFFF4D;
-}
