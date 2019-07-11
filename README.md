@@ -1,2 +1,3 @@
 # Sticky-notes
-* Et javaFX prosjekt som aldri ble helt ferdig.
+* JavaFx sticky notes application
+* Sticky notes with different colors
